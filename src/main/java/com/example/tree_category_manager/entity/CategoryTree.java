@@ -1,37 +1,38 @@
 package com.example.tree_category_manager.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 public class CategoryTree {
-@Id
-@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String mainName;
-    private String fatherName;
-    private String sonName;
+    @Column(nullable = false)
+    private String name;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private CategoryTree parent;
+    @OneToMany(mappedBy = "parent",cascade = CascadeType.ALL)
+    private Set<CategoryTree> subClasses = new HashSet<>();
 
     public CategoryTree() {
     }
 
-    public CategoryTree(String mainName, String fatherName, String sonName) {
-        this.mainName = mainName;
-        this.fatherName = fatherName;
-        this.sonName = sonName;
+    public CategoryTree(String name,CategoryTree parent) {
+        this.name = name;
+        this.parent = parent;
     }
 
     @Override
     public String toString() {
         return "CategoryTree{" +
-                "mainName='" + mainName + '\'' +
-                ", fatherName='" + fatherName + '\'' +
-                ", sonName='" + sonName + '\'' +
+                "mainName='" + name + '\'' +
+                ", fatherName='" + parent + '\'' +
+                ", sonName='" + subClasses + '\'' +
                 '}';
     }
 
@@ -40,39 +41,44 @@ public class CategoryTree {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CategoryTree that = (CategoryTree) o;
-        return Objects.equals(mainName, that.mainName) && Objects.equals(fatherName, that.fatherName) && Objects.equals(sonName, that.sonName);
+        return Objects.equals(name, that.name) && Objects.equals(parent, that.parent) && Objects.equals(subClasses, that.subClasses);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mainName, fatherName, sonName);
+        return Objects.hash(name, parent, subClasses);
     }
 
-    public String getMainName() {
-        return mainName;
+    public String getName() {
+        return name;
     }
 
-    public void setMainName(String mainName) {
-        this.mainName = mainName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getFatherName() {
-        return fatherName;
+    public CategoryTree getParent() {
+        return parent;
     }
 
-    public void setFatherName(String fatherName) {
-        this.fatherName = fatherName;
+    public void setParent(CategoryTree parent) {
+        this.parent = parent;
     }
 
-    public String getSonName() {
-        return sonName;
+    public Set<CategoryTree> getSubClasses() {
+        return subClasses;
     }
 
-    public void setSonName(String sonName) {
-        this.sonName = sonName;
+    public void setSubClasses(Set<CategoryTree> subClasses) {
+        this.subClasses = subClasses;
     }
 
     public Long getId() {
         return id;
+    }
+
+    public void addChildCategory(CategoryTree child) {
+        child.setParent(this);
+        this.subClasses.add(child);
     }
 }
