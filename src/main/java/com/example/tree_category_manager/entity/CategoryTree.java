@@ -2,9 +2,7 @@ package com.example.tree_category_manager.entity;
 
 import jakarta.persistence.*;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 public class CategoryTree {
@@ -13,11 +11,11 @@ public class CategoryTree {
     private Long id;
     @Column(nullable = false)
     private String name;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parent_id")
     private CategoryTree parent;
-    @OneToMany(mappedBy = "parent",cascade = CascadeType.ALL)
-    private Set<CategoryTree> subClasses = new HashSet<>();
+    @OneToMany(mappedBy = "parent",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<CategoryTree> subClasses = new ArrayList<>();
 
     public CategoryTree() {
     }
@@ -29,10 +27,15 @@ public class CategoryTree {
 
     @Override
     public String toString() {
+        StringBuilder subClassesStr = new StringBuilder();
+        for (CategoryTree subClass : subClasses) {
+            subClassesStr.append(subClass.getName()).append(", ");
+        }
+
         return "CategoryTree{" +
                 "mainName='" + name + '\'' +
-                ", fatherName='" + parent + '\'' +
-                ", sonName='" + subClasses + '\'' +
+                ", fatherName='" + (parent != null ? parent.getName() : "null") + '\'' +
+                ", subCategories='" + subClassesStr + '\'' +
                 '}';
     }
 
@@ -65,11 +68,11 @@ public class CategoryTree {
         this.parent = parent;
     }
 
-    public Set<CategoryTree> getSubClasses() {
+    public List<CategoryTree> getSubClasses() {
         return subClasses;
     }
 
-    public void setSubClasses(Set<CategoryTree> subClasses) {
+    public void setSubClasses(List<CategoryTree> subClasses) {
         this.subClasses = subClasses;
     }
 

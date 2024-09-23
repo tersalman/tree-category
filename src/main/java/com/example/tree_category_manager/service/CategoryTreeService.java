@@ -9,10 +9,13 @@ public interface CategoryTreeService {
     List<CategoryTree> showAllTrees();
     CategoryTree getCategoryTree(String name);
 
-    CategoryTree getRootCategories();
-    CategoryTree createCategory(String parentClassName, String mainName);
+    List<CategoryTree> getRootCategories();
+    CategoryTree createCategory(String mainName);
     CategoryTree updateCategory(String oldName, String newName);
     CategoryTree deleteCategory(String categoryName);
-    CategoryTree addSubClasses(Long parentId, String name);
+    CategoryTree addSubCategory(String parent, String name);
+    List<CategoryTree> getAllSubcategories(String categoryName);
+
+    CategoryTree getCategoryParent(String name);
 
 }
